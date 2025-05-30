@@ -18,8 +18,11 @@ public class Balloon : MonoBehaviour
     // public int scoreValue = 10;   // Now from typeData.scoreValue
     public AudioClip popSoundEffect;  // Still useful if you want a generic pop sound,
                                       // or BalloonTypeData could also have a specific sound
-    // ---------------------------------------------------------------------------------------------
+                                      // ---------------------------------------------------------------------------------------------
 
+    private float timeSinceLastDirectionChange = 0f;
+    private int horizontalDirection = 1; // 1 for right, -1 for left
+    private float initialXPosition; // To keep zigzag centered or based on spawn
 
     void Awake()
     {
@@ -63,7 +66,6 @@ public class Balloon : MonoBehaviour
         // popSoundEffect could also be set from typeData if desired:
         // if (typeData.specificPopSound != null) this.popSoundEffect = typeData.specificPopSound;
 
-
         // Apply visual properties
         if (spriteRenderer != null)
         {
@@ -73,9 +75,15 @@ public class Balloon : MonoBehaviour
             }
             spriteRenderer.color = typeData.colorTint; // Applies tint over the sprite
         }
+        
+        // Store initial X position for some movement patterns
+        initialXPosition = transform.position.x;
+        // Randomize initial horizontal direction for variety
+        horizontalDirection = (Random.value > 0.5f) ? 1 : -1;
+        timeSinceLastDirectionChange = 0f;
 
         // Set GameObject name for easier debugging in Hierarchy
-        gameObject.name = typeData.balloonName + "_Instance";
+        gameObject.name = typeData.balloonName + "_Instance (" + typeData.movementType.ToString() + ")";
     }
 
     void Update()
@@ -83,19 +91,46 @@ public class Balloon : MonoBehaviour
         // Don't do anything if not properly initialized
         if (typeData == null) return;
 
-        // Move the balloon upwards
-        transform.Translate(Vector3.up * currentFloatSpeed * Time.deltaTime);
+        // --- Vertical Movement (common to all) ---
+        float verticalMovementDelta = currentFloatSpeed * Time.deltaTime;
 
-        // Check if balloon went off-screen (missed)
-        // Adjust '10f' (or make it a variable) based on your camera's top view
-        if (transform.position.y > 10f)
+        // --- Handle Movement Based on Pattern ---
+        if (typeData.movementType == MovementPattern.SinWave)
         {
-            // Only lose life in Classic mode if GameModeManager and PlayerStatsManager exist
+            // For SinWave, we directly set the X position based on time and initial spawn X
+            // The Y position is still translated upwards.
+            float newX = initialXPosition + typeData.waveAmplitude * Mathf.Sin(Time.time * typeData.waveFrequency);
+            transform.position = new Vector3(newX, transform.position.y + verticalMovementDelta, transform.position.z);
+        }
+        else // For StraightUp and ZigZag, use Translate
+        {
+            float horizontalMovementDelta = 0f;
+            if (typeData.movementType == MovementPattern.ZigZag)
+            {
+                timeSinceLastDirectionChange += Time.deltaTime;
+                if (timeSinceLastDirectionChange >= typeData.directionChangeInterval)
+                {
+                    horizontalDirection *= -1;
+                    timeSinceLastDirectionChange = 0f;
+                }
+                horizontalMovementDelta = horizontalDirection * typeData.horizontalSpeed * Time.deltaTime;
+            }
+            // For StraightUp, horizontalMovementDelta remains 0.
+            transform.Translate(new Vector3(horizontalMovementDelta, verticalMovementDelta, 0));
+        }
+
+        CheckOffScreen(); // This still needs to be called for all movement types
+    }
+
+    void CheckOffScreen()
+    {
+        if (transform.position.y > 10f) // Adjust '10f' based on your camera's top view
+        {
             if (GameModeManager.Instance != null && GameModeManager.Instance.CurrentGameMode == GameModeManager.Mode.Classic)
             {
                 PlayerStatsManager.Instance?.LoseLife();
             }
-            Destroy(gameObject); // Destroy the missed balloon
+            Destroy(gameObject);
         }
     }
 

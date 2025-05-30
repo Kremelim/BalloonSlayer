@@ -6,11 +6,31 @@ public class CrosshairController : MonoBehaviour
     private PlayerControls playerControls;
     private Vector2 mouseLookPosition;
     // public Camera mainCamera; // Assign in Inspector if not Camera.main
+    public Sprite[] allPossibleCrosshairs; // Assign the SAME list of sprites here as in SettingsManager
+    private SpriteRenderer crosshairSpriteRenderer;
 
     void Awake()
     {
         playerControls = new PlayerControls();
-        // if (mainCamera == null) mainCamera = Camera.main; // Fallback
+        crosshairSpriteRenderer = GetComponent<SpriteRenderer>();
+        if (crosshairSpriteRenderer == null)
+        {
+            Debug.LogError("CrosshairController is missing a SpriteRenderer!");
+        }
+        LoadAndApplyCrosshair();
+    }
+
+    void LoadAndApplyCrosshair()
+    {
+        int selectedIndex = PlayerPrefs.GetInt(MainMenuManager.SELECTED_CROSSHAIR_KEY, 0); // Use const from MainMenuManager
+        if (allPossibleCrosshairs != null && allPossibleCrosshairs.Length > selectedIndex && crosshairSpriteRenderer != null)
+        {
+            crosshairSpriteRenderer.sprite = allPossibleCrosshairs[selectedIndex];
+        }
+        else if (allPossibleCrosshairs == null || allPossibleCrosshairs.Length == 0)
+        {
+            Debug.LogWarning("No crosshairs assigned to CrosshairController.allPossibleCrosshairs array.");
+        }
     }
 
     private void OnEnable()

@@ -58,6 +58,16 @@ public class GameModeManager : MonoBehaviour
             Debug.LogWarning("MainBackgroundRenderer not assigned or found for GameModeManager.");
         }
 
+        // Update UI elements based on mode
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateScoreboardColor(CurrentGameMode); // New call
+            if (UIManager.Instance.livesText != null) // Existing lives UI toggle
+            {
+                UIManager.Instance.livesText.gameObject.SetActive(CurrentGameMode == GameModeManager.Mode.Classic);
+            }
+        }
+
         // Reset lives if it's classic mode, or effectively give infinite for Zen
         if (PlayerStatsManager.Instance != null)
         {

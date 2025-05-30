@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f2ed9b6ef7cb604796ed8032b104f89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  popSoundEffect: {fileID: 8300000, guid: 45678fc5195a2e1448221884e3f63b7e, type: 3}
+  popSoundEffect: {fileID: 8300000, guid: d06590a87c4f5d747b731539eb66f1a2, type: 3}
 --- !u!82 &6867173394712586470
 AudioSource:
   m_ObjectHideFlags: 0
@@ -176,7 +176,7 @@ AudioSource:
   m_GameObject: {fileID: 6989332148169959377}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -4665003099405333275, guid: 30cf9827a9db1d8469e4b48508ff1dcb, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
