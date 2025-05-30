@@ -1,5 +1,6 @@
 using UnityEngine;
 
+public enum MovementPattern { StraightUp, SinWave, ZigZag } // Added ZigZag
 // This attribute allows you to create instances of this ScriptableObject
 // from the Assets > Create menu in the Unity Editor.
 [CreateAssetMenu(fileName = "NewBalloonType", menuName = "BalloonSlayer/Balloon Type Data")]
@@ -19,17 +20,18 @@ public class BalloonTypeData : ScriptableObject
     [Header("Movement")]
     public float baseFloatSpeed = 2f;   // Base upward speed before any global speed modifiers
 
-    // [Header("Optional Movement Pattern - Advanced")]
-    // public enum MovementPattern { StraightUp, SinWave, ZigZag }
-    // public MovementPattern movementType = MovementPattern.StraightUp;
-    // public float waveFrequency = 1f;    // For SinWave or ZigZag
-    // public float waveAmplitude = 0.5f;  // For SinWave or ZigZag
-    // public float changeDirectionInterval = 2f; // For ZigZag
+    [Header("Movement Pattern")]
+    public MovementPattern movementType = MovementPattern.StraightUp;
+    public float horizontalSpeed = 2f;    // Speed for horizontal part of zigzag/sinwave
+    public float directionChangeInterval = 1f; // Time until zigzag changes horizontal direction
+    public float waveAmplitude = 1.0f;  // For SinWave: How wide the wave is
+    public float waveFrequency = 1.5f;   // For SinWave: How fast the wave oscillates
 
     [Header("Audio")]
     public AudioClip popSound;          // Specific pop sound for this balloon type (optional, can override generic)
     // public AudioClip spawnSound;     // Optional: sound when this type spawns
-
+    
+    
     // You can add more properties here as needed, for example:
     // public GameObject specialEffectOnPopPrefab;
     // public float sizeModifier = 1f;
